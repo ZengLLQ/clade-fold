@@ -34,7 +34,7 @@ def build_gnm_kirchhoff(
     for i in range(N - 1):
         adj[i, i + 1] = 1.0
         adj[i + 1, i] = 1.0
-    Gamma = -gamma * adj
+    Gamma = np.asarray(-gamma * adj, dtype=np.float64)
     np.fill_diagonal(Gamma, gamma * np.sum(adj, axis=1))
     return Gamma
 

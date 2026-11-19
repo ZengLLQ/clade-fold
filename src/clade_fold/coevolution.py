@@ -128,7 +128,7 @@ def _zero_sum_gauge_frobenius(couplings_4d: FloatArray) -> FloatArray:
     mean_b = np.mean(sub, axis=3, keepdims=True)
     mean_ab = np.mean(sub, axis=(2, 3), keepdims=True)
     gauged = sub - mean_a - mean_b + mean_ab
-    frob = np.sqrt(np.sum(gauged * gauged, axis=(2, 3)))
+    frob = np.asarray(np.sqrt(np.sum(gauged * gauged, axis=(2, 3))), dtype=np.float64)
     np.fill_diagonal(frob, 0.0)
     return frob
 
@@ -201,7 +201,7 @@ def compute_mfdca(
     C += cfg.l2_couplings * np.eye(L * q_red, dtype=np.float64)
 
     inv_C = np.linalg.pinv(C, rcond=1e-6)
-    e4 = -inv_C.reshape(L, q_red, L, q_red).transpose(0, 2, 1, 3)
+    e4 = np.asarray(-inv_C.reshape(L, q_red, L, q_red).transpose(0, 2, 1, 3), dtype=np.float64)
 
     frob_raw = _zero_sum_gauge_frobenius(e4)
     apc_scores = apply_apc_correction(frob_raw, min_seq_sep=cfg.min_seq_sep)
@@ -371,7 +371,7 @@ def compute_coupling_centrality(result: ContactMapResult, min_seq_sep: int = 6) 
     idx = np.arange(L)
     sep = np.abs(idx[:, None] - idx[None, :]) >= min_seq_sep
     pos = np.where(sep, np.maximum(0.0, result.score_matrix), 0.0)
-    return np.sum(pos, axis=1)
+    return np.asarray(np.sum(pos, axis=1), dtype=np.float64)
 
 
 def compare_coevolution_methods(

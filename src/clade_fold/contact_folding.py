@@ -55,7 +55,7 @@ def mds_distance_embedding(dist_matrix: FloatArray) -> FloatArray:
     evals, evecs = np.linalg.eigh(G)
     top3 = np.argsort(evals)[::-1][:3]
     lam = np.maximum(0.0, evals[top3])
-    coords = evecs[:, top3] * np.sqrt(lam)[None, :]
+    coords = np.asarray(evecs[:, top3] * np.sqrt(lam)[None, :], dtype=np.float64)
     if coords.shape != (L, 3):
         out = np.zeros((L, 3), dtype=np.float64)
         out[:, : coords.shape[1]] = coords

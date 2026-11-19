@@ -191,13 +191,13 @@ class ProteinStructure:
         """Compute pairwise Euclidean C-beta distance matrix of shape (L, L) in Angstrom."""
         cb = self.cb_coords
         diff = cb[:, None, :] - cb[None, :, :]
-        return np.sqrt(np.sum(diff * diff, axis=-1))
+        return np.asarray(np.sqrt(np.sum(diff * diff, axis=-1)), dtype=np.float64)
 
     def ca_distance_matrix(self) -> FloatArray:
         """Compute pairwise Euclidean C-alpha distance matrix of shape (L, L) in Angstrom."""
         ca = self.ca_coords
         diff = ca[:, None, :] - ca[None, :, :]
-        return np.sqrt(np.sum(diff * diff, axis=-1))
+        return np.asarray(np.sqrt(np.sum(diff * diff, axis=-1)), dtype=np.float64)
 
     def contact_map(self, cutoff: float = 8.0, min_seq_sep: int = 6) -> NDArray[np.bool_]:
         """Return boolean 3D contact map where d_CB(i, j) <= cutoff and |i - j| >= min_seq_sep."""
@@ -205,7 +205,7 @@ class ProteinStructure:
         L = self.length
         idx = np.arange(L)
         sep = np.abs(idx[:, None] - idx[None, :])
-        return (dist <= cutoff) & (sep >= min_seq_sep)
+        return np.asarray((dist <= cutoff) & (sep >= min_seq_sep), dtype=np.bool_)
 
 
 @dataclass
@@ -243,7 +243,7 @@ class MultipleSequenceAlignment:
 
     def gap_fractions(self) -> FloatArray:
         """Per-column gap fraction in [0, 1]."""
-        return np.mean(self.matrix == GAP_INDEX, axis=0)
+        return np.asarray(np.mean(self.matrix == GAP_INDEX, axis=0), dtype=np.float64)
 
     def consensus_sequence(self) -> str:
         """Compute weighted modal residue consensus sequence."""
