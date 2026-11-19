@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.11', '3.12']
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install package and dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev]
+
+      - name: Compile bytecode check
+        run: python -m compileall src
+
+      - name: Lint with flake8
+        run: flake8 src tests examples
+
+      - name: Static type check with mypy
+        run: mypy src
+
+      - name: Run pytest test suite
+        run: pytest -v
+
+      - name: Smoke test CLI subcommands
+        run: |
+          cladefold --help
+          python -m clade_fold.cli demo --n-taxa 8 --length 32 --mcmc-steps 60 --plm-maxiter 20 --seed 7
+
+      - name: Execute standalone example workflows
+        env:
+          PYTHONPATH: src
+        run: |
+          python examples/01_msa_and_coevolution.py
+          python examples/02_structure_geometry_and_dssp.py
+          python examples/03_phylogenetics_ml_mcmc_asr.py
+          python examples/04_elastic_dynamics_and_coupling.py

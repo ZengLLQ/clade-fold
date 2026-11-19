@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clade-fold"
+version = "0.1.0"
+description = "Structural proteomics, co-evolutionary contact inference, elastic normal-mode dynamics, and Bayesian Felsenstein phylogenetics."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+authors = [
+    { name = "CladeFold Contributors" }
+]
+keywords = [
+    "bioinformatics",
+    "structural-proteomics",
+    "direct-coupling-analysis",
+    "phylogenetics",
+    "normal-mode-analysis"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics"
+]
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "flake8>=6.0",
+    "mypy>=1.5"
+]
+
+[project.scripts]
+cladefold = "clade_fold.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = ["scipy", "scipy.*"]
+ignore_missing_imports = true
